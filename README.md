@@ -5,7 +5,7 @@ for more detail and screenshot to set up lab.
 
 highly recommend git book version.
 
-please click https://ricotech.gitbook.io/ricotech/~/edit/drafts/-LNFpd72-omtrzunkvMP/
+please click https://ricotech.gitbook.io/ricotech/
 
 ## MAC Environment 
 Because filebeat need to collect log.
