@@ -1,5 +1,12 @@
 # ELK-filebeat-nginx
 
+## Git book version
+for more detail and screenshot to set up lab.
+
+highly recommend git book version.
+
+please click https://ricotech.gitbook.io/ricotech/~/edit/drafts/-LNFpd72-omtrzunkvMP/
+
 ## MAC Environment 
 Because filebeat need to collect log.
 
@@ -11,7 +18,7 @@ So I install nginx on local and set up ELK & filebeat by docker compose.
 
 `brew install nginx`
 
-open browser http://localhost:8080/ and refresh it made some logs.
+open browser http://localhost:8080/ and refresh (command + r) it made some logs.
 
 nginx default location in /usr/local/var/log/nginx/
 
@@ -24,7 +31,9 @@ error log just ignore it.
 ## 2. Set up ELK by docker compose
 
 Because docker bind mount directory need to add first.
+
 Then nginx’s log can collect by filebeat
+
 Add /usr/local/var/log/nginx/ in docker file sharing
 
 `docker-compose up`
@@ -32,7 +41,7 @@ Add /usr/local/var/log/nginx/ in docker file sharing
 
 ## 3. Collecting logs
 
-make some logs. refresh in http://localhost:8080/
+make some logs. refresh (command + r) in http://localhost:8080/
 
 And go to http://localhost:5601/
 
