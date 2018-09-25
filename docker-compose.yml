@@ -1,0 +1,97 @@
+version: '3.4'
+services:
+ elasticsearch:
+   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+   container_name: elasticsearch
+   healthcheck:
+           test: ["CMD", "curl", "-f", "http://localhost:9200"]
+           interval: 20s
+           timeout: 3s
+           retries: 2
+           start_period: 10s
+   environment:
+     - cluster.name=docker-cluster
+     - bootstrap.memory_lock=true
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+   ulimits:
+     memlock:
+       soft: -1
+       hard: -1
+   volumes:
+     - esdata1:/usr/share/elasticsearch/data
+   ports:
+     - 9200:9200
+   networks:
+     - esnet
+ elasticsearch2:
+   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+   container_name: elasticsearch2
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9200"]
+     interval: 20s
+     timeout: 3s
+     start_period: 10s
+   environment:
+     - cluster.name=docker-cluster
+     - bootstrap.memory_lock=true
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - "discovery.zen.ping.unicast.hosts=elasticsearch"
+   ulimits:
+     memlock:
+       soft: -1
+       hard: -1
+   volumes:
+     - esdata2:/usr/share/elasticsearch/data
+   networks:
+     - esnet
+ logstash:
+   image: docker.elastic.co/logstash/logstash:6.4.0
+   container_name: logstash
+   secrets:
+     - source: logstash.conf
+       target: /usr/share/logstash/pipeline/logstash.conf
+   networks:
+     - esnet
+ kibana:
+   image: docker.elastic.co/kibana/kibana:6.4.0
+   container_name: kibana
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:5601"]
+     interval: 20s
+     timeout: 3s
+     retries: 2
+     start_period: 10s
+   environment:
+     SERVER_NAME: kibana.example.org
+     ELASTICSEARCH_URL: http://elasticsearch:9200
+   ports:
+     - 5601:5601
+   networks:
+     - esnet
+ filebeat:
+   image: docker.elastic.co/beats/filebeat:6.4.0
+   container_name: filebeat
+   user: root
+   depends_on: ['elasticsearch', 'kibana', 'logstash']
+   secrets:
+     - source: filebeat.yml
+       target: /usr/share/filebeat/filebeat.yml
+   volumes:
+     - /usr/local/var/log/nginx:/usr/local/var/log/nginx
+   networks:
+     - esnet
+
+volumes:
+ esdata1:
+   driver: local
+ esdata2:
+   driver: local
+
+secrets:
+ logstash.conf:
+   file: ./configs/logstash/logstash.conf
+ filebeat.yml:
+   file: ./configs/filebeat/filebeat.yml
+
+networks:
+ esnet:
